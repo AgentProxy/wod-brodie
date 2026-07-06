@@ -54,6 +54,7 @@ function handleStart() {
   <div class="setup">
     <header class="setup__header">
       <span class="setup__brand">WOD<em>Brodie</em></span>
+      <span class="setup__byline">by Eric Flores</span>
     </header>
 
     <section class="setup__modes">
@@ -158,6 +159,14 @@ function handleStart() {
 .setup__brand em {
   color: var(--color-orange);
   font-style: normal;
+}
+.setup__byline {
+  display: block;
+  margin-top: var(--sp-1);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-secondary);
 }
 
 .mode-grid {

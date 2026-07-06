@@ -1,3 +1,4 @@
 <template>
+  <SplashScreen />
   <NuxtPage />
 </template>
