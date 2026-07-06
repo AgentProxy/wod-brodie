@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import type { TimerMode, TimerConfig } from '~/composables/useWodTimer'
 import { useBoard } from '~/composables/useBoard'
 
@@ -9,6 +9,20 @@ const { movements, addMovement, removeMovement } = useBoard()
 const selectedMode = ref<TimerMode>('forTime')
 const capMin = ref<number | null>(null)
 const newMovement = ref('')
+
+// EMOM config
+const EMOM_PRESETS = [1, 2, 3]
+const emomPresetMin = ref(1)
+const emomCustomMin = ref<number | null>(null)
+const emomRounds = ref(8)
+const emomIntervalSec = computed(() =>
+  emomCustomMin.value ? emomCustomMin.value * 60 : emomPresetMin.value * 60
+)
+
+function selectEmomPreset(min: number) {
+  emomPresetMin.value = min
+  emomCustomMin.value = null
+}
 
 const modes: { mode: TimerMode; label: string }[] = [
   { mode: 'forTime', label: 'For Time' },
@@ -28,6 +42,8 @@ function handleStart() {
   const cfg: TimerConfig = {
     mode: selectedMode.value,
     capMin: selectedMode.value === 'forTime' ? capMin.value : undefined,
+    intervalSec: selectedMode.value === 'emom' ? emomIntervalSec.value : undefined,
+    rounds: selectedMode.value === 'emom' ? emomRounds.value : undefined,
     movements: [...movements.value],
   }
   emit('start', cfg)
@@ -65,6 +81,35 @@ function handleStart() {
           class="config-input"
         />
       </label>
+    </section>
+
+    <section v-if="selectedMode === 'emom'" class="setup__config">
+      <div class="config-label">Every</div>
+      <div class="emom-interval-row">
+        <button
+          v-for="p in EMOM_PRESETS"
+          :key="p"
+          class="interval-pill"
+          :class="{ 'interval-pill--active': emomCustomMin === null && emomPresetMin === p }"
+          @click="selectEmomPreset(p)"
+        >{{ p }} min</button>
+        <input
+          v-model.number="emomCustomMin"
+          type="number"
+          min="1"
+          max="60"
+          placeholder="Custom"
+          class="config-input emom-custom"
+          @focus="emomPresetMin = 0"
+        />
+      </div>
+
+      <div class="config-label rounds-label">Rounds</div>
+      <div class="stepper">
+        <button class="stepper-btn" @click="emomRounds = Math.max(1, emomRounds - 1)">−</button>
+        <span class="stepper-value">{{ emomRounds }}</span>
+        <button class="stepper-btn" @click="emomRounds = Math.min(60, emomRounds + 1)">+</button>
+      </div>
     </section>
 
     <section class="setup__board">
@@ -139,6 +184,66 @@ function handleStart() {
   font-size: 1rem;
   padding: var(--sp-3) var(--sp-4);
   width: 100%;
+}
+
+.emom-interval-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.interval-pill {
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  color: var(--color-secondary);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: var(--sp-2) var(--sp-4);
+  min-height: 44px;
+  min-width: 72px;
+  transition: border-color 0.15s, color 0.15s;
+}
+.interval-pill--active {
+  border-color: var(--color-orange);
+  color: var(--color-chalk);
+}
+
+.emom-custom {
+  flex: 1;
+  min-width: 90px;
+  max-width: 120px;
+}
+
+.rounds-label {
+  margin-top: var(--sp-4);
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-2);
+}
+.stepper-btn {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-chalk);
+  font-size: 1.4rem;
+  line-height: 1;
+  min-width: 48px;
+  min-height: 48px;
+}
+.stepper-value {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  color: var(--color-chalk);
+  min-width: 40px;
+  text-align: center;
 }
 
 .board-title {

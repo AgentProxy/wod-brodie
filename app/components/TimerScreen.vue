@@ -35,11 +35,14 @@ const phaseLabel = computed(() => {
     case 'countdown': return 'GET READY'
     case 'work': return props.config.mode === 'tabata' ? 'WORK' : ''
     case 'rest': return 'REST'
-    case 'paused': return 'PAUSED'
     case 'done': return 'DONE'
     default: return ''
   }
 })
+
+const showRoundChip = computed(() =>
+  props.config.mode === 'emom' && (props.phase === 'work' || props.phase === 'rest')
+)
 
 const toCapDisplay = computed(() => {
   if (props.toCapSec === null) return null
@@ -62,6 +65,7 @@ const toCapDisplay = computed(() => {
     <!-- Running / work / rest -->
     <template v-else-if="phase === 'work' || phase === 'rest'">
       <div class="timer__glow" />
+      <div v-if="showRoundChip" class="timer__round-chip">RD {{ currentRound }}/{{ totalRounds }}</div>
       <div v-if="phaseLabel" class="timer__phase-label">{{ phaseLabel }}</div>
       <div class="timer__digits">{{ displayTime }}</div>
       <div v-if="toCapDisplay" class="timer__secondary">{{ toCapDisplay }}</div>
@@ -75,7 +79,8 @@ const toCapDisplay = computed(() => {
           :class="{ 'timer__board-item--active': i === activeMovementIndex && config.mode === 'emom' }"
         >
           <span class="board-station">{{ i + 1 }}</span>
-          {{ mv }}
+          <span>{{ mv }}</span>
+          <span v-if="i === activeMovementIndex && config.mode === 'emom'" class="now-tag">NOW</span>
         </li>
       </ul>
 
@@ -136,6 +141,19 @@ const toCapDisplay = computed(() => {
   position: relative;
 }
 
+.timer__round-chip {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  color: var(--color-secondary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  padding: var(--sp-1) var(--sp-3);
+  margin-bottom: var(--sp-3);
+  position: relative;
+}
+
 .timer__phase-label {
   font-family: var(--font-display);
   font-size: 1.2rem;
@@ -144,6 +162,17 @@ const toCapDisplay = computed(() => {
   text-transform: uppercase;
   margin-bottom: var(--sp-3);
   position: relative;
+}
+
+.now-tag {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  background: var(--color-orange);
+  color: #fff;
+  border-radius: var(--radius-pill);
+  padding: 2px 7px;
+  margin-left: auto;
 }
 
 .timer__digits {

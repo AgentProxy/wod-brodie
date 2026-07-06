@@ -35,6 +35,7 @@ export function useWodTimer() {
   let startTimestamp = 0
   let pausedTotal = 0
   let pauseStart = 0
+  let prePausePhase: TimerPhase = 'work'
   let rafId = 0
   const firedCues = new Set<string>()
 
@@ -100,9 +101,24 @@ export function useWodTimer() {
     if (cfg.mode === 'forTime') {
       const d = deriveForTime(elapsed, cfg)
       result = { ...result, ...d }
+    } else if (cfg.mode === 'emom') {
+      const intervalSec = cfg.intervalSec ?? 60
+      const rounds = cfg.rounds ?? 8
+      const round = Math.floor(elapsed / intervalSec) + 1
+      const withinInterval = elapsed % intervalSec
+      const remainingInInterval = intervalSec - withinInterval
+      const done = elapsed >= rounds * intervalSec
+      result = {
+        phase: done ? 'done' : 'work',
+        displaySec: done ? 0 : remainingInInterval,
+        round: Math.min(round, rounds),
+        totalRounds: rounds,
+        toCapSec: null,
+        activeMovementIndex: (round - 1) % Math.max(cfg.movements.length, 1),
+      }
     }
 
-    // Future modes: amrap, emom, tabata will be added in v0.2
+    // amrap, tabata will be added in v0.2
     return result
   }
 
@@ -120,6 +136,7 @@ export function useWodTimer() {
 
   function pause() {
     if (phase.value !== 'work' && phase.value !== 'rest' && phase.value !== 'countdown') return
+    prePausePhase = phase.value
     pauseStart = performance.now()
     cancelAnimationFrame(rafId)
     phase.value = 'paused'
@@ -128,8 +145,7 @@ export function useWodTimer() {
   function resume() {
     if (phase.value !== 'paused') return
     pausedTotal += performance.now() - pauseStart
-    // Restore the phase we were in before pausing (work for now)
-    phase.value = 'work'
+    phase.value = prePausePhase
     rafId = requestAnimationFrame(tick)
   }
 
