@@ -1,0 +1,58 @@
+:root {
+  /* Base */
+  --color-floor: #111315;
+  --color-chalk: #F2F0EB;
+  --color-orange: #F26419;
+
+  /* Phase semantic (set dynamically via --phase) */
+  --color-work: #2BB673;
+  --color-rest: #3B79E6;
+  --color-countdown: #F2B21B;
+  --color-done: #E24545;
+
+  /* Steel surfaces */
+  --color-surface: #191C1F;
+  --color-border: #2C3136;
+  --color-secondary: #8B9199;
+
+  /* Phase variable — overridden per timer state */
+  --phase: var(--color-work);
+
+  /* Typography */
+  --font-display: 'Anton', sans-serif;
+  --font-body: 'Space Grotesk', sans-serif;
+  --font-mono: 'Chivo Mono', monospace;
+
+  /* Spacing */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background: var(--color-floor);
+  color: var(--color-chalk);
+  font-family: var(--font-body);
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
