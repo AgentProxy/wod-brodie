@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   future: { compatibilityVersion: 4 },
   ssr: false,
   devtools: { enabled: true },
-  modules: ['@vite-pwa/nuxt'],
+  modules: ['@vite-pwa/nuxt', '@vercel/analytics/nuxt'],
   app: {
     head: {
       title: 'WODBrodie',
